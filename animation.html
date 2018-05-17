@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Animation</title>
+    <script>
+        let pos = [
+            [300, 300],
+            [500, 100],
+            [500, 500],
+            [700, 150],
+            [700, 450],
+        ];
+
+        let anim = [
+            [1, 'current'],
+            [1, 'grey'],
+            [5, 'grey'],
+            [5, 'black'],
+            [5, 'push'],
+            [1, 'black'],
+            [1, 'push'],
+            [1, 'nocurrent'],
+            [2, 'current'],
+            [2, 'grey'],
+            [2, 'black'],
+            [2, 'push'],
+            [2, 'nocurrent'],
+            [3, 'current'],
+            [3, 'grey'],
+            [4, 'grey'],
+            [4, 'black'],
+            [4, 'push'],
+            [3, 'black'],
+            [3, 'push'],
+            [3, 'nocurrent'],
+            [4, 'current'],
+            [4, 'nocurrent'],
+            [5, 'current'],
+            [5, 'nocurrent'],
+
+            [5, 'pop'],
+            [4, 'pop'],
+            [3, 'pop'],
+            [2, 'pop'],
+            [1, 'pop'],
+        ];
+
+        let anim_idx = 0;
+        let ival = 0;
+        let ai = 0;
+
+        let clicked = false;
+
+        let stacksize = 0;
+        let stack = [];
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        document.onclick = function() {
+            clicked = true;
+        }
+
+        function main() {
+            for (let i = 1; i <= 5; ++i) {
+                document.querySelector(`#vc-${i}`).style.top = `${pos[i-1][0]}px`;
+                document.querySelector(`#vc-${i}`).style.left = `${pos[i-1][1]}px`;
+            }
+            ival = setInterval(async function() {
+                if (!clicked) {
+                    return;
+                }
+                clicked = false;
+                if (anim_idx >= anim.length) {
+                    clearInterval(ival);
+                    return;
+                }
+                a = anim[anim_idx];
+                ++anim_idx;
+                switch (a[1]) {
+                    case 'current':
+                        document.querySelector(`#vc-${a[0]}`).classList.add('current');
+                        break;
+                    case 'nocurrent':
+                        document.querySelector(`#vc-${a[0]}`).classList.remove('current');
+                        break;
+                    case 'black':
+                        document.querySelector(`#vc-${a[0]}`).classList.add('black');
+                        document.querySelector(`#vc-${a[0]}`).classList.remove('grey');
+                        break;
+                    case 'grey':
+                        document.querySelector(`#vc-${a[0]}`).classList.add('grey');
+                        document.querySelector(`#vc-${a[0]}`).classList.remove('black');
+                        break;
+                    case 'pop':
+                        {
+                        --stacksize;
+                        el = document.querySelector(`#span${a[0] - 1}`);
+
+                        let t0 = parseInt(el.style.top);
+                        let l0 = parseInt(el.style.left);
+                        let id = parseInt(el.innerHTML);
+                        //alert(`id = ${id}, a[0] = ${a[0]}`);
+
+                        el.classList.add('current');
+                        /*
+                        let t1 = parseInt(document.querySelector(`#vc-${id}`).style.top);
+                        let l1 = parseInt(document.querySelector(`#vc-${id}`).style.left);
+                        for (let i = 0; i < 25; ++i) {
+                            //alert()
+                            let t = (t1 * i + t0 * (25 - i)) / 25;
+                            let l = (l1 * i + l0 * (25 - i)) / 25;
+                            el.style.top = `${t}px`;
+                            el.style.left = `${l}px`;
+                            //alert(t);
+                            await sleep(1000 / 25);
+                        }
+                        */
+                        document.querySelector(`#vc-${id} .vertex`).innerHTML += '<p style="color:red !important;">' + (5 - stacksize) + '</p>';
+                        //document.querySelector(`#vc-${id} .vertex`).classList.add('red_text');
+                        //el.remove();
+                        }
+                        break;
+                    case 'push':
+                    //    let par = document.querySelector(`#vc-${a[0]}`).parentNode
+                    //    let el = document.createElement('span')
+                    //    par.appendChild(el);
+                        document.body.innerHTML += '<span id="span' + stacksize + '" style="top: 0px; left: 0px;"></span>'
+                        //el.style = {'top': '0px', 'left': '0px'};
+                        el = document.querySelector('#span' + stacksize);
+                        el.innerHTML = document.querySelector(`#vc-${a[0]} .vertex`).innerHTML;
+                        el.style.top = `${document.querySelector(`#vc-${a[0]}`).style.top}`;
+                        el.style.left = `${document.querySelector(`#vc-${a[0]}`).style.left}`;
+                        let t0 = parseInt(el.style.top);
+                        let l0 = parseInt(el.style.left);
+                        let t1 = 200 + stacksize * 60;
+                        ++stacksize;
+                        stack.push(el);
+                        let l1 = 800;
+                        for (let i = 0; i < 25; ++i) {
+                            //alert()
+                            let t = (t1 * i + t0 * (25 - i)) / 25;
+                            let l = (l1 * i + l0 * (25 - i)) / 25;
+                            el.style.top = `${t}px`;
+                            el.style.left = `${l}px`;
+                            await sleep(1000 / 25);
+                        }
+                        el.style.top = `${t1}px`;
+                        el.style.left = `${l1}px`;
+                        //el.classList.add('pushed')
+                        break;
+                    default:
+                        break;
+                }
+            }, 100);
+        }
+    </script>
+    <style media="screen">
+        .vertex-container {
+            border: 5px solid blue;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            position: absolute;
+        }
+        .vertex {
+            display: table-cell;
+            width: 100px;
+            height: 100px;
+            vertical-align: middle;
+            text-align: center;
+            margin: auto;
+            font-family: monospace;
+            font-size: 3em;
+        }
+        .current {
+            border-color: red !important;
+        }
+        .grey {
+            background-color: #BBB;
+            border-color: #77F;
+        }
+        .black {
+            background-color: #000;
+            color: white;
+            border-color: #AAF;
+        }
+        span {
+            display: table-cell !important;
+            position: absolute;
+            border: 5px solid blue;
+            width: 100px;
+            height: 40px;
+            font-family: monospace;
+            font-size: 3em;
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body onload="main()">
+    <h1> This is an animation of topological sort </h1>
+    <hr>
+    <div class="vertex-container" id="vc-1">
+        <div id="vertex1" class="vertex" style="top: 0px; left: 0px">1</div>
+    </div>
+    <div class="vertex-container" id="vc-2">
+        <div id="vertex2" class="vertex" style="top: 0px; left: 0px">2</div>
+    </div>
+    <div class="vertex-container" id="vc-3">
+        <div id="vertex3" class="vertex" style="top: 0px; left: 0px">3</div>
+    </div>
+    <div class="vertex-container" id="vc-4">
+        <div id="vertex4" class="vertex" style="top: 0px; left: 0px">4</div>
+    </div>
+    <div class="vertex-container" id="vc-5">
+        <div id="vertex5" class="vertex" style="top: 0px; left: 0px">5</div>
+    </div>
+    <img src="arrows.png" style="position: absolute; top: 257px; left: 62px; z-index: -1000;">
+</body>
+</html>
