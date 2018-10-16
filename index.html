@@ -1,1 +1,70 @@
-animation.html
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Đéäđlïñə</title>
+        <style>
+            * {
+                font-family: sans-serif;
+            }
+            body {
+                margin: auto;
+                max-width: 600px;
+            }
+            .red {
+                color: red;
+            }
+            .output {
+                margin: 5px;
+                padding: 5px;
+                flex-direction: column;
+                background-color: #eee;
+                border: 1px solid #ccc;
+                font-size: 1.4em;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="red">Đéäđlïñə</h1>
+        <div class="label">До сдачи IT-проектов осталось</div>
+        <div class="output" id="output">...</div>
+    </body>
+    <script type="text/javascript">
+        function getWordForm(value, list) {
+            if (parseInt((value % 100) / 10) == 1) {
+                return list[2];
+            } else if (value % 10 == 1) {
+                return list[0];
+            } else if (value % 10 < 5 && value % 10 != 0) {
+                return list[1];
+            } else {
+                return list[2];
+            }
+        }
+
+        const targetDate = new Date('November 2, 2018 23:59:59');
+        const outputElement = document.getElementById('output');
+        setInterval(function() {
+            const currentDate = new Date();
+            let diff = parseInt((targetDate - currentDate) / 1000);
+            if (diff < 0) {
+                outputElement.innerHTML = 'ничего';
+            } else {
+                const seconds = diff % 60;
+                diff = parseInt(diff / 60);
+                const minutes = diff % 60;
+                diff = parseInt(diff / 60);
+                const hours = diff % 24;
+                diff = parseInt(diff / 24);
+                const days = diff;
+
+                const daysWordForm = getWordForm(days, ['день', 'дня', 'дней', 'дно']);
+                const hoursWordForm = getWordForm(hours, ['час', 'часа', 'часов', 'чашка']);
+                const minutesWordForm = getWordForm(minutes, ['минута', 'минуты', 'минут', 'минимизация функции']);
+                const secondsWordForm = getWordForm(seconds, ['секунда', 'секунды', 'секунд', 'секущая']);
+
+                outputElement.innerHTML = `${days} ${daysWordForm}, ${hours} ${hoursWordForm}, ${minutes} ${minutesWordForm}, ${seconds} ${secondsWordForm}`;
+            }
+        }, 200);
+    </script>
+</html>
